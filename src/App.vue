@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { startSTT, speak } from "./lib/speech.js";
+import Footer from "./components/Footer.vue";
+
 import { askLLM } from "./lib/llmClient.js";
 import {
   getPokemon,
@@ -265,6 +267,7 @@ function toggleMic() {
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <Footer> </Footer>
     </v-container>
   </v-app>
 </template>
