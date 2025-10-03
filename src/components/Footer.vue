@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="bg-grey-darken-4 text-white pa-6" app>
+  <v-footer class="bg-grey-darken-4 text-white pa-1" app>
     <v-container class="text-center">
       <!-- Botones con tooltips -->
       <div class="mb-3 d-flex justify-center">

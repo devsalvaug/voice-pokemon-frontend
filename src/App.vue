@@ -130,145 +130,144 @@ function toggleMic() {
 
 <template>
   <v-app class="bg-grey-darken-4 text-white">
-    <v-container class="fill-height d-flex flex-column">
-      <!-- Header con botón de ayuda -->
-      <v-app-bar color="blue-darken-4" dark flat>
-        <v-toolbar-title>🎙️ Voicebot Pokémon</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon color="white" @click="showDialog = true">
-          <v-icon>mdi-help-circle-outline</v-icon>
-        </v-btn>
-      </v-app-bar>
+    <!-- Header -->
+    <v-app-bar color="blue-darken-4" dark flat>
+      <v-toolbar-title>🎙️ Voicebot Pokémon</v-toolbar-title>
+      <v-spacer />
+      <!-- Botón para abrir el diálogo de ayuda -->
+      <v-btn icon @click="dialog = true">
+        <v-icon>mdi-help-circle</v-icon>
+      </v-btn>
+    </v-app-bar>
 
-      <!-- 🎤 Botón moderno centrado -->
-      <div class="mic-wrapper">
-        <v-btn
-          :color="listening ? 'red' : 'pink'"
-          size="x-large"
-          class="mic-btn"
-          @click="toggleMic"
+    <!-- Contenido principal con scroll -->
+    <v-main class="overflow-y-auto">
+      <v-container class="d-flex flex-column align-center py-6">
+        <!-- 🎤 Botón moderno centrado abajo -->
+        <div class="mic-wrapper">
+          <v-btn
+            :color="listening ? 'red' : 'pink'"
+            size="x-large"
+            class="mic-btn"
+            @click="toggleMic"
+            elevation="12"
+          >
+            {{ listening ? "Detener 🎤" : "Hablar 🎙️" }}
+          </v-btn>
+          <div v-if="listening" class="pulse-ring"></div>
+        </div>
+
+        <!-- Último mensaje -->
+        <v-card class="ma-4 pa-3" color="grey-darken-3" width="100%">
+          <div v-if="history.length">
+            <div class="text-caption grey--text">
+              {{
+                history[history.length - 1].role === "user" ? "Tú" : "Asistente"
+              }}
+            </div>
+            <div>{{ history[history.length - 1].text }}</div>
+          </div>
+        </v-card>
+
+        <!-- Último Pokémon consultado -->
+        <v-card
+          v-if="lastPokemon"
+          class="ma-6 pa-6 text-center d-flex flex-column align-center justify-center pokemon-card"
           elevation="12"
         >
-          {{ listening ? "Detener 🎤" : "Hablar 🎙️" }}
-        </v-btn>
-        <!-- Efecto de pulso cuando escucha -->
-        <div v-if="listening" class="pulse-ring"></div>
-      </div>
-
-      <!-- Último mensaje -->
-      <v-card class="ma-4 pa-3" color="grey-darken-3">
-        <div v-if="history.length">
-          <div class="text-caption grey--text">
-            {{
-              history[history.length - 1].role === "user" ? "Tú" : "Asistente"
-            }}
+          <h2 class="text-h5 font-weight-bold text-capitalize mb-3">
+            {{ lastPokemon.name }}
+          </h2>
+          <v-avatar size="150" class="mb-4" color="grey-darken-3">
+            <v-img :src="lastPokemon.sprite" alt="sprite" contain />
+          </v-avatar>
+          <div class="text-subtitle-1 mb-1">
+            <strong>Tipos:</strong> {{ lastPokemon.types.join(", ") }}
           </div>
-          <div>{{ history[history.length - 1].text }}</div>
-        </div>
-      </v-card>
-
-      <!-- Último Pokémon consultado -->
-      <v-card
-        v-if="lastPokemon"
-        class="ma-6 pa-6 text-center d-flex flex-column align-center justify-center pokemon-card"
-        elevation="12"
-      >
-        <h2 class="text-h5 font-weight-bold text-capitalize mb-3">
-          {{ lastPokemon.name }}
-        </h2>
-        <v-avatar size="150" class="mb-4" color="grey-darken-3">
-          <v-img :src="lastPokemon.sprite" alt="sprite" contain />
-        </v-avatar>
-        <div class="text-subtitle-1 mb-1">
-          <strong>Tipos:</strong> {{ lastPokemon.types.join(", ") }}
-        </div>
-        <div class="text-subtitle-2 text-grey-lighten-1">
-          Altura: {{ (lastPokemon.height / 10).toFixed(1) }} m | Peso:
-          {{ (lastPokemon.weight / 10).toFixed(1) }} kg
-        </div>
-      </v-card>
-
-      <!-- Favoritos -->
-      <v-card v-if="favorites.length" class="ma-4 pa-3" color="yellow-darken-2">
-        <h3 class="text-h6">⭐ Mis Favoritos</h3>
-        <v-chip-group column>
-          <v-chip
-            v-for="f in favorites"
-            :key="f"
-            class="ma-1"
-            color="yellow-darken-4"
-          >
-            {{ f }}
-          </v-chip>
-        </v-chip-group>
-      </v-card>
-
-      <!-- Collapse con historial -->
-      <v-expansion-panels multiple class="ma-4">
-        <v-expansion-panel>
-          <v-expansion-panel-title class="bg-grey-darken-3 text-white">
-            📜 Ver historial completo
-          </v-expansion-panel-title>
-          <v-expansion-panel-text class="bg-grey-darken-4 text-grey-lighten-3">
-            <v-list bg-color="transparent">
-              <v-list-item
-                v-for="(m, i) in history.slice(0, history.length - 1)"
-                :key="i"
-              >
-                <v-list-item-content>
-                  <v-list-item-title
-                    class="text-caption text-blue-grey-lighten-3"
-                  >
-                    {{ m.role === "user" ? "Tú" : "Asistente" }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle class="text-grey-lighten-1">
-                    {{ m.text }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
-
-      <!-- 🆕 Diálogo de bienvenida -->
-      <v-dialog v-model="showDialog" max-width="500">
-        <v-card>
-          <v-card-title class="text-h6 font-weight-bold">
-            👋 Bienvenido a Voicebot Pokémon
-          </v-card-title>
-          <v-card-text>
-            <p>Este bot puede ayudarte con estas acciones:</p>
-            <ul>
-              <li>
-                🔍 <strong>Consultar información</strong> de un Pokémon.<br />Ej:
-                “Dime información de Pikachu”.
-              </li>
-              <li>
-                ❤️ <strong>Guardar favoritos</strong>.<br />Ej: “Guarda a
-                Charmander en favoritos”.
-              </li>
-              <li>
-                📋 <strong>Listar favoritos</strong>.<br />Ej: “Muéstrame mis
-                favoritos”.
-              </li>
-              <li>
-                ❌ <strong>Eliminar un favorito</strong>.<br />Ej: “Quita a
-                Pikachu de favoritos”.
-              </li>
-            </ul>
-            <p class="mt-3">🎙️ Solo di el comando y el bot hará el resto.</p>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue-darken-3" text @click="showDialog = false">
-              ¡Entendido!
-            </v-btn>
-          </v-card-actions>
+          <div class="text-subtitle-2 text-grey-lighten-1">
+            Altura: {{ (lastPokemon.height / 10).toFixed(1) }} m | Peso:
+            {{ (lastPokemon.weight / 10).toFixed(1) }} kg
+          </div>
         </v-card>
-      </v-dialog>
-      <Footer> </Footer>
-    </v-container>
+
+        <!-- Favoritos -->
+        <v-card
+          v-if="favorites.length"
+          class="ma-4 pa-3"
+          color="yellow-darken-2"
+          width="100%"
+        >
+          <h3 class="text-h6">⭐ Mis Favoritos</h3>
+          <v-chip-group column>
+            <v-chip
+              v-for="f in favorites"
+              :key="f"
+              class="ma-1"
+              color="yellow-darken-4"
+            >
+              {{ f }}
+            </v-chip>
+          </v-chip-group>
+        </v-card>
+
+        <!-- Collapse con historial -->
+        <v-expansion-panels multiple class="ma-4" width="100%">
+          <v-expansion-panel>
+            <v-expansion-panel-title class="bg-grey-darken-3 text-white">
+              📜 Ver historial completo
+            </v-expansion-panel-title>
+            <v-expansion-panel-text
+              class="bg-grey-darken-4 text-grey-lighten-3"
+            >
+              <v-list bg-color="transparent">
+                <v-list-item
+                  v-for="(m, i) in history.slice(0, history.length - 1)"
+                  :key="i"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title
+                      class="text-caption text-blue-grey-lighten-3"
+                    >
+                      {{ m.role === "user" ? "Tú" : "Asistente" }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle class="text-grey-lighten-1">
+                      {{ m.text }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-container>
+    </v-main>
+
+    <!-- Footer -->
+    <Footer />
+
+    <!-- Diálogo de ayuda -->
+    <v-dialog v-model="dialog" max-width="500">
+      <v-card>
+        <v-card-title class="text-h6">ℹ️ Cómo usar el bot</v-card-title>
+        <v-card-text>
+          Puedes hablarle al bot y pedirle:
+          <ul>
+            <li>
+              🔍 Información de un Pokémon → “Dime información de Pikachu”
+            </li>
+            <li>
+              ❤️ Guardar en favoritos → “Guarda a Charmander en favoritos”
+            </li>
+            <li>📋 Listar favoritos → “Muéstrame mis favoritos”</li>
+            <li>❌ Eliminar de favoritos → “Quita a Pikachu de favoritos”</li>
+          </ul>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn color="primary" @click="dialog = false">Entendido</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
