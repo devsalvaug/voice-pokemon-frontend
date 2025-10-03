@@ -19,7 +19,7 @@ export async function getPokemon(name) {
 }
 
 // --- Favoritos (tu backend Express) ---
-const API = "http://localhost:3001";
+const API = "https://voice-pokemon-backend.onrender.com";
 
 export async function listFavorites(userId) {
   const r = await fetch(

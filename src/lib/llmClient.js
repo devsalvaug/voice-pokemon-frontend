@@ -1,6 +1,6 @@
 // src/lib/llmClient.js
 export async function askLLM(messages) {
-  const r = await fetch("http://localhost:3001/api/llm", {
+  const r = await fetch("https://voice-pokemon-backend.onrender.com/api/llm", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ messages }),
